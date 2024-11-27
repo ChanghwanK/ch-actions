@@ -1,0 +1,45 @@
+name: Java Jar Build
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: 'The inputs for the workflow.'
+        required: true
+        type: string
+
+env:
+  IMAGE_TAG: ${{ github.event.inputs.tag }}
+
+jobs:
+  jar-build:
+    name: Build Jar
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+      
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build -x test
+
+#      - name: Build and Push Docker Image
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: .
+#          push: true
+#          tags: makememove/demo:${{ env.IMAGE_TAG }}
+#          cache-from: type=gha
+#          cache-to: type=gha,mode=max
+#
